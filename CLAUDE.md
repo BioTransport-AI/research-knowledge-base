@@ -7,11 +7,11 @@ snapshots of the live research tracker — it is not the product codebase.
 
 **On USC:** Dr. Penkova is USC faculty (Big Data in Biotransport Center), but BioTransport AI as a
 company/brand is NOT formally integrated with USC — she looked into it and there was no clear
-path. Don't describe BioTransport AI itself as "USC-affiliated" in anything outreach-facing
-(emails, external docs); it overstates a relationship that doesn't formally exist. It's fine to
-note Dr. Penkova's own USC appointment where relevant (e.g., an NIH grant would likely route
-through her USC standing, not through "BioTransport AI" as an entity) — just don't conflate the
-two.
+path. Per Dr. Penkova directly (Discord, 2026-09-22): **remove USC from every line of every
+outreach email** — not just signatures, not just "USC-affiliated," all of it, including the NIH
+email even though she signs that one as PI. This is a blanket rule now, not a judgment call: "If
+we integrate one day and it works for us, then we can include the USC name." Every reference is
+just "BioTransport AI" until she says otherwise.
 
 ## Team
 
@@ -32,7 +32,8 @@ Primary coordination channel is Discord.
   offline-readable backup. These go stale between snapshots; treat the live doc as authoritative
   when both exist.
 - **`.claude/skills/`** — Claude Code skills specific to BioTransport AI workflows. Currently:
-  `biotransport-meeting-notes` (raw meeting notes → themed, actionable tracker updates).
+  `biotransport-meeting-notes` (raw meeting notes → themed, actionable tracker updates) and
+  `biotransport-outreach-email` (research + draft outreach to funders/data providers).
 
 ## Standing rules
 

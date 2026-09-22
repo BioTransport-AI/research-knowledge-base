@@ -43,6 +43,17 @@ takes real research per organization, not a template with the name swapped in. T
 4. **Draft each email** with: Subject line, Send-to (with verification status), and a body under
    ~250 words covering intent, the specific ask, why-us, and what's-in-it-for-them. Keep it
    scannable — these are being read by busy program officers and lab managers, not colleagues.
+   - **If the user has already sent or restyled one of these emails themselves** (pasted a
+     screenshot or final version), treat that as the house style going forward — match its
+     greeting convention, tone, formatting (bold, links), and closing for the rest of the batch,
+     not the earlier generic draft. Their actual sent copy always wins over a first-pass template.
+   - **Only claim a product is "already live" when it actually is.** Diabetes and anemia screening
+     are live; glaucoma imaging is not (the live glaucoma product is a chatbot, not a screener) —
+     for glaucoma-imaging asks, frame it honestly as extending the team's existing, proven
+     approach rather than implying the glaucoma tool already exists.
+   - **If the user says they'll add their own signature, stop at the closing line** (e.g., "Thank
+     you for your time.") and don't draft a name/title/contact block — that avoids drafting
+     something that gets silently overwritten or duplicated.
 5. **Note who should send it.** Funder/program-officer contacts (especially NIH-style
    pre-submission inquiries) are normally most credible coming from the PI (Dr. Penkova) directly.
    Data-access requests can reasonably come from any team member. Say which, don't just default to
@@ -50,12 +61,12 @@ takes real research per organization, not a template with the name swapped in. T
 
 ## Standing rules to enforce
 
-- **No "USC-affiliated" in signatures.** Dr. Penkova is USC faculty, but BioTransport AI as a
-  company/brand has no formal USC integration — she tried and there was no clear path. Sign-offs
-  say "BioTransport AI," not "BioTransport AI, University of Southern California." It's fine to
-  mention her USC appointment in a body paragraph where it's genuinely relevant (it's real and
-  often is what makes a submission credible), just don't assert it as BioTransport AI's own
-  institutional affiliation.
+- **No USC, anywhere, full stop (updated 2026-09-22 — Dr. Penkova, in Discord: "remove USC from
+  every line. If we integrate one day and it works for us, then we can include the USC name").**
+  Not the signature, not the body, not "USC-affiliated," not "Our team at USC." Every reference is
+  just "BioTransport AI." This applies even to the NIH pre-submission email, which is signed by
+  Dr. Penkova as PI — her USC appointment is real, but the rule is now blanket until she says
+  otherwise, not a case-by-case judgment call.
 - **Confidentiality:** describe cancer-detection methodology only at the level of abstraction
   already used elsewhere (e.g., "an ensemble-based approach," "advanced computational methods") —
   never spell out the specific implementation, even to make an email sound more impressive.
