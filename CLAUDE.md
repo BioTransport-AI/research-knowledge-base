@@ -1,9 +1,17 @@
 # BioTransport AI — research coordination repo
 
-BioTransport AI (biotransportai.com, USC-affiliated, Pasadena CA) builds eye-photo health
-screening tools and is raising external funding and sourcing training data for diabetes, anemia,
-glaucoma, and cancer-imaging research. This repo holds the team's shared Claude Code skills and
-point-in-time snapshots of the live research tracker — it is not the product codebase.
+BioTransport AI (biotransportai.com, Pasadena CA) builds eye-photo health screening tools and is
+raising external funding and sourcing training data for diabetes, anemia, glaucoma, and
+cancer-imaging research. This repo holds the team's shared Claude Code skills and point-in-time
+snapshots of the live research tracker — it is not the product codebase.
+
+**On USC:** Dr. Penkova is USC faculty (Big Data in Biotransport Center), but BioTransport AI as a
+company/brand is NOT formally integrated with USC — she looked into it and there was no clear
+path. Don't describe BioTransport AI itself as "USC-affiliated" in anything outreach-facing
+(emails, external docs); it overstates a relationship that doesn't formally exist. It's fine to
+note Dr. Penkova's own USC appointment where relevant (e.g., an NIH grant would likely route
+through her USC standing, not through "BioTransport AI" as an entity) — just don't conflate the
+two.
 
 ## Team
 

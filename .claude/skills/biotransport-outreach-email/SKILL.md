@@ -50,6 +50,12 @@ takes real research per organization, not a template with the name swapped in. T
 
 ## Standing rules to enforce
 
+- **No "USC-affiliated" in signatures.** Dr. Penkova is USC faculty, but BioTransport AI as a
+  company/brand has no formal USC integration — she tried and there was no clear path. Sign-offs
+  say "BioTransport AI," not "BioTransport AI, University of Southern California." It's fine to
+  mention her USC appointment in a body paragraph where it's genuinely relevant (it's real and
+  often is what makes a submission credible), just don't assert it as BioTransport AI's own
+  institutional affiliation.
 - **Confidentiality:** describe cancer-detection methodology only at the level of abstraction
   already used elsewhere (e.g., "an ensemble-based approach," "advanced computational methods") —
   never spell out the specific implementation, even to make an email sound more impressive.
