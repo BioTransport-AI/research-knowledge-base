@@ -58,6 +58,17 @@ takes real research per organization, not a template with the name swapped in. T
    pre-submission inquiries) are normally most credible coming from the PI (Dr. Penkova) directly.
    Data-access requests can reasonably come from any team member. Say which, don't just default to
    one signature.
+6. **When a reply comes in, close the loop in the tracker before moving on.** Add a "Reply
+   received" note under the original draft with what was actually said, correct anything in the
+   Funding/Data tables that the reply contradicts (learned the hard way: a "free GCP credits" perk
+   we'd researched turned out to be stale info IDC itself hadn't updated — verify a claimed perk or
+   deadline is still true, don't just trust a research pass from days earlier), and draft any
+   necessary follow-up as a new dated sub-item rather than editing the original send record.
+7. **A data-hosting support desk isn't the same as a grant program's officers**, even when one
+   organization runs both (e.g., NCI IDC support ≠ NCI ITCR program administration). If an inquiry
+   about funding fit and a request about data access both plausibly go to the same general inbox,
+   send them as separate emails to the most specific contact for each, not one email to whichever
+   address is easiest to find.
 
 ## Standing rules to enforce
 
