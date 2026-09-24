@@ -24,18 +24,25 @@ Primary coordination channel is Discord.
 ## Where things live
 
 - **Live source of truth:** the "BioTransport AI — Funding & Data Tracker" doc (a Claude Docs
-  artifact, two tabs: Funding & Data Tracker, Research Notes & Sources) tracks funding leads, data
-  sources, and meeting-notes-derived action items in real time. It's scoped to a Claude workspace,
-  not this repo, so cloning this repo doesn't grant access to it — ask whoever has access for the
-  current link.
+  artifact, tabs: Funding & Data Tracker, Research Notes & Sources, Outreach Drafts, Free Data:
+  Ready Now, Glaucoma Model) tracks funding leads, data sources, and meeting-notes-derived action
+  items in real time. It's scoped to a Claude workspace, not this repo, so cloning this repo
+  doesn't grant access to it — ask whoever has access for the current link.
 - **`tracker-snapshots/`** — dated PDF exports of that doc, committed periodically as a durable,
   offline-readable backup. These go stale between snapshots; treat the live doc as authoritative
   when both exist.
+- **`datasets/`** — per-dataset README + fetch script for every source in the tracker's Free Data
+  tab. No dataset files are ever committed here (size and license reasons — see
+  `datasets/README.md`); scripts pull into a local, gitignored `data/` folder instead.
+- **`papers/`** — reference papers the team is building on (e.g., the Parikh/Nguyen/Penkova 2026
+  glaucoma paper). Fine to commit — these are either the team's own publications or copies shared
+  for internal research use in a private repo, not bulk third-party datasets.
+- **`brand/`** — logo concepts and reference images.
 - **`.claude/skills/`** — Claude Code skills specific to BioTransport AI workflows. Currently:
   `biotransport-meeting-notes` (raw meeting notes → themed, actionable tracker updates),
   `biotransport-outreach-email` (research + draft outreach to funders/data providers), and
   `biotransport-data-workflow` (read-only-source / write-derived-output convention for working
-  with the team's datasets).
+  with the team's datasets — see `datasets/`).
 
 ## Standing rules
 

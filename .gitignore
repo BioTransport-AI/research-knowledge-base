@@ -1,0 +1,9 @@
+# Fetched dataset files (see datasets/*/README.md for how to get them) —
+# never commit actual dataset contents here, whatever the source or license.
+/data/
+
+# Common local cruft
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
