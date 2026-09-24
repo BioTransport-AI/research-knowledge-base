@@ -31,16 +31,25 @@ controlled tier, ORIGA and OHTS pending replies, IDC's agentic interface. Re-acq
 a local copy got corrupted isn't a quick retry, it can mean re-running a whole access request. The
 read-only convention exists so experimentation is always safe to redo from scratch.
 
-## Practical pattern
+## Practical pattern — use the actual tooling, don't hand-roll this each time
 
-1. Load the original dataset from wherever it's stored (local download, mounted drive, or queried
-   live via an interface like IDC's agentic API) — read-only.
-2. Do the actual work (feature engineering, model input prep, analysis) into memory or a working
-   dataframe.
-3. Write the result to a new, clearly-named location. Never overwrite step 1's source.
-4. If the derived output is something the team will reuse, note what it is and how it was built
-   (briefly — not a full methods section) wherever the team tracks that kind of thing, so nobody
-   has to reverse-engineer it later.
+`datasets/biotransport_datasets/` (added 2026-09-24) implements this pattern concretely — use it
+rather than writing ad hoc pandas/PIL loading code per task:
+
+1. Fetch raw files via that dataset's `fetch.sh` (or manual steps) into gitignored `data/<name>/`
+   — read-only from here on.
+2. Build a small Parquet **index** over it (`python -m biotransport_datasets.build <name>`, or
+   `build_index()` in Python) — file paths, labels, splits, demographics, not pixel data. This is
+   the only thing that gets loaded eagerly; it's a few MB even for tens of thousands of rows.
+3. Read images lazily off that index during actual work — `load_split()` for a plain dataframe
+   (tabular-only), or `BioTransportImageDataset` (a lazy `torch.utils.data.Dataset`) when you need
+   the actual pixels, so nothing decodes more than one batch of images into memory at a time.
+4. Write any derived output (computed features, predictions, splits) via `write_derived()` to
+   `data/<name>/derived/<what-it-is>.parquet` — never back into the index or the raw files.
+
+Only SMDG-19 has a recipe (step 2) implemented so far — see
+`datasets/biotransport_datasets/recipes/_template.py` for adding another, and do it against the
+dataset's real downloaded layout, not guessed column names from documentation.
 
 ## Distribution note
 

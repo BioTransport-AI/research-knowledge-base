@@ -1,0 +1,10 @@
+# Core: building and reading dataset indexes (Parquet) -- always needed.
+pandas>=2.0
+pyarrow>=14.0
+pyyaml>=6.0
+
+# Only needed once you're actually loading images (BioTransportImageDataset).
+pillow>=10.0
+
+# Only needed for the DataLoader / model-training side, not for indexing.
+# torch>=2.2

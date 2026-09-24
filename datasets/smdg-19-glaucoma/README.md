@@ -37,3 +37,16 @@ after that exclusion, not the full 12,449. Don't skip this step if reproducing t
 
 Lands in `data/smdg-19-glaucoma/`. Requires the Kaggle CLI and API token — see the parent
 `datasets/README.md`.
+
+## Then build the index
+
+```bash
+python -m biotransport_datasets.build smdg-19-glaucoma
+```
+
+This is the only dataset here with an indexing recipe implemented so far
+(`biotransport_datasets/recipes/smdg19.py`) — see the parent README's Quickstart for how to
+actually load train/test splits or stream images from the result. The recipe's column-name
+assumptions are inferred from public docs, not a real `metadata.csv` — if the build fails with a
+column-mismatch error, that's expected on the first real run; the error message says exactly what
+to fix.

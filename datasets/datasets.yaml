@@ -1,0 +1,90 @@
+# Master dataset registry. Both the fetch scripts and the Python indexing/loading
+# layer (biotransport_datasets/) read this — one place to look up what a dataset is,
+# where it comes from, and whether tooling exists to index it yet.
+#
+# `recipe: null` means the fetch script/manual process exists (see that dataset's
+# README) but nobody has written the Parquet-indexing recipe yet, usually because
+# nobody has the raw files downloaded to check the actual column names/layout against.
+
+datasets:
+  - name: smdg-19-glaucoma
+    condition: glaucoma
+    modality: [image, tabular]
+    access: kaggle_dataset
+    kaggle_slug: deathtrooper/multichannel-glaucoma-benchmark-dataset
+    license: unspecified-per-source-dataset  # aggregates 19 datasets, each with its own terms
+    local_dir: data/smdg-19-glaucoma
+    recipe: smdg19
+    notes: >
+      Dataset used in Parikh/Nguyen/Penkova 2026 (see papers/). Exclude images used
+      for segmentation-model training before building a classification split --
+      the recipe's build_index() tags these via the `used_for_segmentation` column
+      so callers can filter rather than the recipe silently dropping rows.
+
+  - name: eyepacs-diabetes
+    condition: diabetes
+    modality: [image]
+    access: kaggle_competition
+    kaggle_slug: diabetic-retinopathy-detection
+    license: competition-terms
+    local_dir: data/eyepacs-diabetes
+    recipe: null
+
+  - name: aptos2019-diabetes
+    condition: diabetes
+    modality: [image]
+    access: kaggle_competition
+    kaggle_slug: aptos2019-blindness-detection
+    license: competition-terms
+    local_dir: data/aptos2019-diabetes
+    recipe: null
+
+  - name: messidor2-diabetes
+    condition: diabetes
+    modality: [image]
+    access: manual
+    license: academic-registration
+    local_dir: data/messidor2-diabetes
+    recipe: null
+
+  - name: idrid-diabetes
+    condition: diabetes
+    modality: [image]
+    access: manual
+    license: CC-BY-4.0
+    local_dir: data/idrid-diabetes
+    recipe: null
+
+  - name: ai-readi-diabetes
+    condition: diabetes
+    modality: [image, tabular]
+    access: manual
+    license: gated-attestation-required
+    local_dir: data/ai-readi-diabetes
+    recipe: null
+    notes: 3.8TB full release -- index recipe should support building from a partial/modality-filtered local copy, not assume the whole thing is present.
+
+  - name: cp-anemic
+    condition: anemia
+    modality: [image, tabular]
+    access: manual
+    license: CC-BY-4.0
+    local_dir: data/cp-anemic
+    recipe: null
+
+  - name: eyes-defy-anemia
+    condition: anemia
+    modality: [image, tabular]
+    access: kaggle_dataset
+    kaggle_slug: harshwardhanfartale/eyes-defy-anemia
+    license: unspecified
+    local_dir: data/eyes-defy-anemia
+    recipe: null
+
+  - name: idc-cancer-imaging
+    condition: cancer
+    modality: [image]
+    access: agentic-api
+    license: per-collection
+    local_dir: null  # queried live, not a local fetch -- see its README
+    recipe: null
