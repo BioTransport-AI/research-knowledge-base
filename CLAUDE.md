@@ -32,8 +32,10 @@ Primary coordination channel is Discord.
   offline-readable backup. These go stale between snapshots; treat the live doc as authoritative
   when both exist.
 - **`.claude/skills/`** — Claude Code skills specific to BioTransport AI workflows. Currently:
-  `biotransport-meeting-notes` (raw meeting notes → themed, actionable tracker updates) and
-  `biotransport-outreach-email` (research + draft outreach to funders/data providers).
+  `biotransport-meeting-notes` (raw meeting notes → themed, actionable tracker updates),
+  `biotransport-outreach-email` (research + draft outreach to funders/data providers), and
+  `biotransport-data-workflow` (read-only-source / write-derived-output convention for working
+  with the team's datasets).
 
 ## Standing rules
 
