@@ -1,13 +1,25 @@
 """Indexing recipe for SMDG-19 (Standardized Multi-Channel Dataset for Glaucoma).
 
-IMPORTANT: the exact column names in metadata.csv are inferred from the dataset's
-public documentation (its Kaggle page and the standardized-multichannel-dataset-
-glaucoma GitHub README), not confirmed against the real file -- nobody on the team
-had it downloaded yet when this was written. COLUMN_MAP below is the one place to
-fix things if the real names differ; build_index() will fail with a clear message
-(listing the actual columns it found) rather than silently building a wrong index
-if the mapping doesn't match. Run once after fetching, fix COLUMN_MAP if needed,
-rerun.
+Verified against the real download (2026-10-03, 12,449 rows, 48 columns).
+The metadata file is named "metadata - standardized.csv", not "metadata.csv"
+-- the Kaggle page's docs don't mention the space/suffix. Two of the original
+column guesses actively collided with a second real column mapping to the
+same target (pandas silently creates duplicate-named columns on rename
+rather than erroring, which then breaks downstream with a confusing error
+far from the real cause):
+  - "names" was guessed as an alternate for file_path, but it holds bare IDs
+    with no file extension ("OIA-ODIR-TEST-OFFLINE-1"), not a usable path.
+    "fundus" (e.g. "/full-fundus/OIA-ODIR-TEST-OFFLINE-1.png") is the real one.
+  - "gender" was guessed as an alternate for sex, but it's 90% empty
+    (488 of 12,449 rows) -- "sex" is the populated column (4,516 non-null;
+    the rest are presumably from sub-datasets that didn't record it at all).
+
+"types" is the real label column: 0 = non-glaucoma (7,549), 1 = glaucoma
+(4,767), -1 = glaucoma-suspect (133) -- matches the documented ~7,499 /
+~4,817 / 133 split closely enough to be clearly the right column (small
+drift is consistent with a dataset version update since the docs were
+written). "type_expanded" has finer-grained, human-readable subtypes but is
+NaN for nearly half the rows, so it's not usable as the primary label.
 """
 
 from __future__ import annotations
@@ -16,36 +28,43 @@ from pathlib import Path
 
 import pandas as pd
 
-# Left side: what we assume the CSV calls a column. Right side: what our index
-# calls it. To check the real names:
-#   python -c "import pandas as pd; print(pd.read_csv('data/smdg-19-glaucoma/metadata.csv').columns.tolist())"
 COLUMN_MAP = {
     "fundus": "file_path",
-    "names": "file_path",
     "types": "label",
-    "class": "label",
     "age": "age",
     "sex": "sex",
-    "gender": "sex",
 }
 
-IMAGE_SUBDIR = "full-fundus"
-SEGMENTATION_SUBDIRS = ["optic-cup", "optic-disc", "blood-vessel", "vessel-artery", "vessel-vein"]
+METADATA_FILENAME = "metadata - standardized.csv"
+
+# Each top-level folder from the Kaggle zip contains one redundant nested
+# folder of the same name before the actual images -- e.g. the real files are
+# at full-fundus/full-fundus/*.png, not full-fundus/*.png. Verified against
+# the real download: counts match the paper's documented figures exactly
+# (full-fundus 12,449; optic-disc 3,103; optic-cup 2,874; blood-vessel 462).
+IMAGE_SUBDIR = "full-fundus/full-fundus"
+SEGMENTATION_SUBDIRS = [
+    "optic-cup/optic-cup",
+    "optic-disc/optic-disc",
+    "blood-vessel/blood-vessel",
+    "vessel-artery/vessel-artery",
+    "vessel-vein/vessel-vein",
+]
 
 
 def build(raw_dir: Path) -> pd.DataFrame:
-    metadata_path = raw_dir / "metadata.csv"
+    metadata_path = raw_dir / METADATA_FILENAME
     if not metadata_path.exists():
         raise FileNotFoundError(
             f"{metadata_path} not found -- did the Kaggle download finish? "
-            f"Expected metadata.csv at the root of {raw_dir}."
+            f"Expected '{METADATA_FILENAME}' at the root of {raw_dir}."
         )
 
     raw = pd.read_csv(metadata_path)
     rename = {src: dst for src, dst in COLUMN_MAP.items() if src in raw.columns}
     if "file_path" not in rename.values() or "label" not in rename.values():
         raise ValueError(
-            "Couldn't find the expected image-path or label column in metadata.csv.\n"
+            f"Couldn't find the expected image-path or label column in {METADATA_FILENAME}.\n"
             f"Actual columns: {raw.columns.tolist()}\n"
             f"COLUMN_MAP only matched: {rename}\n"
             "Update COLUMN_MAP at the top of this file to match, then rerun."
