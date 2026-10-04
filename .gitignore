@@ -2,8 +2,14 @@
 # never commit actual dataset contents here, whatever the source or license.
 /data/
 
+# Local staging copy used to build the Drive upload (source of truth is datasets/) —
+# regenerate from datasets/ if needed, never commit it here.
+/free_datasets/
+/free_datasets.zip
+
 # Common local cruft
 .DS_Store
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+*.egg-info/
