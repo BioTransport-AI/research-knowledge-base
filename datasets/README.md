@@ -65,6 +65,15 @@ glaucoma model). To add another: copy `biotransport_datasets/recipes/_template.p
 `build()` against that dataset's real downloaded layout (not guessed from docs — see the SMDG-19
 recipe's comments for why that matters), and set `recipe: <name>` in `datasets.yaml`.
 
+## Using this from another repo
+
+`biotransport_datasets` is a real pip-installable package now
+(`pyproject.toml` in this directory), not just an importable folder —
+`pip install -e <path-to-this-directory>` from anywhere. That's how
+`glaucoma-model` consumes it (`-e ../ai-research/datasets` in its
+`requirements.txt`); the same pattern works for any sibling repo that needs
+fetch/index/load without copying code.
+
 ## Using this with an agent (e.g., for model development)
 
 Follow the [`biotransport-data-workflow`](../.claude/skills/biotransport-data-workflow/SKILL.md)
