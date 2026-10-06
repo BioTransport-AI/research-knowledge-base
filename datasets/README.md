@@ -51,6 +51,13 @@ ds = BioTransportImageDataset("smdg-19-glaucoma", exclude_segmentation_leakage=T
 dl = DataLoader(ds, batch_size=32, shuffle=True, num_workers=4)
 ```
 
+`split="train"` is a real stratified-by-label 80:10:10 assignment (see the
+SMDG-19 recipe's `SPLIT_RATIOS`/`SPLIT_SEED`), made once across the whole
+index at build time — not every dataset's recipe sets this column, and
+`load_split()` silently returns everything, unfiltered, if a recipe doesn't
+(check `df.columns` before relying on `split` meaning something for a
+dataset other than SMDG-19).
+
 ## Why Parquet specifically
 
 Compact (columnar + compression — a 12k-row index is single-digit MB), fast to filter/query

@@ -26,6 +26,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 COLUMN_MAP = {
@@ -50,6 +51,52 @@ SEGMENTATION_SUBDIRS = [
     "vessel-artery/vessel-artery",
     "vessel-vein/vessel-vein",
 ]
+
+# The subset of SEGMENTATION_SUBDIRS that glaucoma_model.features.extract_features()
+# actually consumes (vasculature_density() takes the blood-vessel mask specifically,
+# not artery/vein separately -- see that module's docstring). Captured as real paths,
+# not just the leakage boolean below, because the segmentation stage needs to load
+# these images as training targets, not merely know a mask exists.
+MASK_SUBDIRS = {
+    "optic_cup_mask_path": "optic-cup/optic-cup",
+    "optic_disc_mask_path": "optic-disc/optic-disc",
+    "vasculature_mask_path": "blood-vessel/blood-vessel",
+}
+
+# No macula masks exist anywhere in the public SMDG-19 download (verified: zero
+# files under any "*macula*" path). The paper's macula ground truth (Section 3.5)
+# is a separate, manual annotation the authors did themselves on 728 images via
+# Roboflow -- it was never part of SMDG-19's public release. There is nothing to
+# add a MASK_SUBDIRS entry for; reproducing the macula/SegFormer stage will
+# require the team to annotate its own macula masks, same as the paper's authors
+# did, not a recipe fix. Tracked in glaucoma-model's README under Known gaps.
+
+# Stratify-by-label train/val/test split, assigned once across the whole index at
+# build time so every downstream task (classification, each segmentation structure)
+# filters the *same* assignment rather than each caller re-splitting independently
+# -- the only way to guarantee a classification-train image and a segmentation-train
+# image were never meant to land on opposite sides of a boundary. Ratios and the
+# stratify-by-label choice match the paper's own "stratified splits... in 80:10:10
+# ratio" (Section 3.1); the paper doesn't restate the stratify key for the
+# per-structure segmentation splits in 3.2-3.5, so this applies the one convention
+# it does state everywhere else it's explicit.
+SPLIT_RATIOS = (0.8, 0.1, 0.1)
+SPLIT_SEED = 42
+
+
+def _assign_stratified_split(labels: pd.Series) -> pd.Series:
+    rng = np.random.RandomState(SPLIT_SEED)
+    split = pd.Series(index=labels.index, dtype=object)
+    for _, group in labels.groupby(labels):
+        idx = group.index.to_numpy().copy()
+        rng.shuffle(idx)
+        n = len(idx)
+        n_train = int(round(n * SPLIT_RATIOS[0]))
+        n_val = int(round(n * SPLIT_RATIOS[1]))
+        split.loc[idx[:n_train]] = "train"
+        split.loc[idx[n_train : n_train + n_val]] = "val"
+        split.loc[idx[n_train + n_val :]] = "test"
+    return split
 
 
 def build(raw_dir: Path) -> pd.DataFrame:
@@ -91,7 +138,23 @@ def build(raw_dir: Path) -> pd.DataFrame:
             seg_ids.update(p.stem for p in seg_dir.glob("*"))
     df["used_for_segmentation"] = df["image_id"].isin(seg_ids)
 
-    keep = ["image_id", "file_path", "condition", "label", "used_for_segmentation"]
+    # Real mask paths for the structures extract_features() consumes -- NaN where
+    # this image has no mask for that structure (most rows: only 2,874 of 12,449
+    # have an optic-cup mask, for instance). Same stem-matching assumption as the
+    # leakage flag above.
+    mask_cols = []
+    for col_name, sub in MASK_SUBDIRS.items():
+        mask_dir = raw_dir / sub
+        paths_by_id = {p.stem: str(p) for p in mask_dir.glob("*")} if mask_dir.exists() else {}
+        df[col_name] = df["image_id"].map(paths_by_id)
+        mask_cols.append(col_name)
+
+    # One global split, stratified by label, assigned once here so every caller
+    # (classification, each segmentation structure) filters the same assignment --
+    # see _assign_stratified_split()'s docstring comment above for why that matters.
+    df["split"] = _assign_stratified_split(df["label"])
+
+    keep = ["image_id", "file_path", "condition", "label", "used_for_segmentation", "split", *mask_cols]
     for optional in ("age", "sex"):
         if optional in df.columns:
             keep.append(optional)
