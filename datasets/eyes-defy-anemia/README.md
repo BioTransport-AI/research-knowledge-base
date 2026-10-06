@@ -3,7 +3,7 @@
 **Condition:** Anemia · **Modality:** Conjunctiva images
 **Source:** [Kaggle](https://www.kaggle.com/datasets/harshwardhanfartale/eyes-defy-anemia) ·
 also mirrored on [IEEE DataPort](https://ieee-dataport.org/documents/eyes-defy-anemia)
-**Size:** 218 images (Indian and Italian patients), with hemoglobin ground truth — small.
+**Size:** 218 images (Indian and Italian patients), with hemoglobin ground truth. Small.
 
 ## Fetch
 

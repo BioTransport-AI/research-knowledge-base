@@ -2,12 +2,12 @@
 
 This directory does **not** contain dataset files or their pixel data. It has three layers:
 
-1. **Fetch** — each subdirectory's `README.md` + `fetch.sh` (where licensing allows it) downloads
+1. **Fetch**: each subdirectory's `README.md` and `fetch.sh` (where licensing allows it) download
    raw files into a local, gitignored `data/<name>/` folder at the repo root.
-2. **Index** — `biotransport_datasets/` builds a small Parquet file per dataset
-   (`data/<name>/index.parquet`) holding file paths, labels, splits, and demographics — not image
+2. **Index**: `biotransport_datasets/` builds a small Parquet file per dataset
+   (`data/<name>/index.parquet`) holding file paths, labels, splits, and demographics, not image
    bytes. Even a 12k-row dataset indexes down to a few MB.
-3. **Load** — `biotransport_datasets.loader` reads that small index eagerly (fits in memory, loads
+3. **Load**: `biotransport_datasets.loader` reads that small index eagerly (fits in memory, loads
    in under a second) and streams the actual image files off disk lazily, one at a time, as a
    training loop asks for them. Nothing decodes 10,000 images into RAM at once.
 
@@ -18,14 +18,14 @@ dataset is, where it comes from, its license, and whether an indexing recipe exi
 
 Two hard blockers, not preferences:
 
-- **Size.** Several of these (AI-READI is ~3.8TB; EyePACS is tens of GB) are far past GitHub's
-  100MB per-file hard limit and would bloat the repo's history permanently even if they somehow
-  fit. Git is not built for large binary datasets.
-- **License/redistribution terms.** EyePACS, AI-READI, APTOS, and IDRiD are each gated behind an
-  explicit usage attestation on their own platform (a Kaggle account accepting competition rules,
-  IEEE DataPort registration, AI-READI's "state your research purpose" step). Copying the raw
-  files into a different repo would likely violate those terms — for AI-READI specifically, that
-  could jeopardize the team's ability to use the dataset at all if it surfaced.
+- **Size.** Several of these (AI-READI is about 3.8TB, EyePACS is tens of GB) are far past
+  GitHub's 100MB per-file hard limit and would bloat the repo's history permanently even if they
+  somehow fit. Git is not built for large binary datasets.
+- **License and redistribution terms.** EyePACS, AI-READI, APTOS, and IDRiD are each gated behind
+  an explicit usage attestation on their own platform (a Kaggle account accepting competition
+  rules, IEEE DataPort registration, AI-READI's "state your research purpose" step). Copying the
+  raw files into a different repo would likely violate those terms. For AI-READI specifically,
+  that could jeopardize the team's ability to use the dataset at all if it surfaced.
 
 ## Quickstart (SMDG-19, the one actually in use for the glaucoma model)
 
@@ -41,64 +41,63 @@ Then, from Python (anywhere with `datasets/` on the path):
 ```python
 from biotransport_datasets import load_split, BioTransportImageDataset
 
-# Tabular-only — a plain dataframe, e.g. for the paper's 1D-CNN biomarker baseline
+# Tabular-only: a plain dataframe, e.g. for the paper's 1D-CNN biomarker baseline
 train_df = load_split("smdg-19-glaucoma", split="train", exclude_segmentation_leakage=True)
 
-# Streaming images for the vision-transformer branches — nothing decoded until iterated
+# Streaming images for the vision-transformer branches: nothing decoded until iterated
 from torch.utils.data import DataLoader
 ds = BioTransportImageDataset("smdg-19-glaucoma", exclude_segmentation_leakage=True,
                                numeric_columns=["age"])
 dl = DataLoader(ds, batch_size=32, shuffle=True, num_workers=4)
 ```
 
-`split="train"` is a real stratified-by-label 80:10:10 assignment (see the
-SMDG-19 recipe's `SPLIT_RATIOS`/`SPLIT_SEED`), made once across the whole
-index at build time — not every dataset's recipe sets this column, and
-`load_split()` silently returns everything, unfiltered, if a recipe doesn't
-(check `df.columns` before relying on `split` meaning something for a
-dataset other than SMDG-19).
+`split="train"` is a real stratified-by-label 80:10:10 assignment (see the SMDG-19 recipe's
+`SPLIT_RATIOS` and `SPLIT_SEED`), made once across the whole index at build time. Not every
+dataset's recipe sets this column, and `load_split()` silently returns everything, unfiltered, if
+a recipe doesn't. Check `df.columns` before relying on `split` meaning something for a dataset
+other than SMDG-19.
 
 ## Why Parquet specifically
 
-Compact (columnar + compression — a 12k-row index is single-digit MB), fast to filter/query
-(`load_split(..., where="label == 1 and age >= 40")` doesn't touch a single image file), and reads
-natively from pandas, polars, DuckDB, or Spark if the team's tooling ever changes. Raw images stay
-as plain JPEG/PNG files on disk — Parquet is for the *index*, not for storing pixel data.
+It is compact (columnar plus compression means a 12k-row index is single-digit MB), fast to
+filter and query (`load_split(..., where="label == 1 and age >= 40")` doesn't touch a single image
+file), and reads natively from pandas, polars, DuckDB, or Spark if the team's tooling ever
+changes. Raw images stay as plain JPEG or PNG files on disk. Parquet is only for the *index*, not
+for storing pixel data.
 
 ## Adding indexing support for another dataset
 
 Only SMDG-19 has a recipe implemented so far (it's the one actually needed right now, for the
 glaucoma model). To add another: copy `biotransport_datasets/recipes/_template.py`, implement
-`build()` against that dataset's real downloaded layout (not guessed from docs — see the SMDG-19
+`build()` against that dataset's real downloaded layout (not guessed from docs, see the SMDG-19
 recipe's comments for why that matters), and set `recipe: <name>` in `datasets.yaml`.
 
 ## Using this from another repo
 
-`biotransport_datasets` is a real pip-installable package now
-(`pyproject.toml` in this directory), not just an importable folder —
-`pip install -e <path-to-this-directory>` from anywhere. That's how
-`glaucoma-model` consumes it (`-e ../ai-research/datasets` in its
-`requirements.txt`); the same pattern works for any sibling repo that needs
-fetch/index/load without copying code.
+`biotransport_datasets` is a real pip-installable package now (`pyproject.toml` in this
+directory), not just an importable folder. Run `pip install -e <path-to-this-directory>` from
+anywhere. That's how `glaucoma-model` consumes it (`-e ../ai-research/datasets` in its
+`requirements.txt`). The same pattern works for any sibling repo that needs fetch, index, and load
+without copying code.
 
 ## Using this with an agent (e.g., for model development)
 
 Follow the [`biotransport-data-workflow`](../.claude/skills/biotransport-data-workflow/SKILL.md)
-skill: read the original files and the index, never modify them, write any derived output
+skill: read the original files and the index, never modify them, and write any derived output
 (computed features, model predictions) via `write_derived()` to `data/<name>/derived/`, never back
 into the indexed dataset itself.
 
 ## Setup once, before running any fetch script
 
-- **Kaggle-hosted datasets** (SMDG-19, EyePACS, APTOS, EYES-DEFY-ANEMIA): install the `kaggle`
-  CLI (`pip install kaggle`) and put your Kaggle API token at `~/.kaggle/kaggle.json` — generate
-  one at kaggle.com/settings under "API." You also need to accept each dataset's/competition's
-  terms on its Kaggle page at least once, in a browser, before the CLI can download it.
-- **AI-READI**: no script — it's a manual portal flow (login, state research purpose, attest to
+- **Kaggle-hosted datasets** (SMDG-19, EyePACS, APTOS, EYES-DEFY-ANEMIA): install the `kaggle` CLI
+  (`pip install kaggle`) and put your Kaggle API token at `~/.kaggle/kaggle.json`. Generate one at
+  kaggle.com/settings under "API." You also need to accept each dataset's or competition's terms
+  on its Kaggle page at least once, in a browser, before the CLI can download it.
+- **AI-READI**: no script. It's a manual portal flow (login, state research purpose, attest to
   usage terms) by design. See that folder's README.
-- **Messidor-2, IDRiD, CP-AnemiC**: no script — I couldn't confirm a stable, unauthenticated
-  download URL for any of these without a browser session, and I'm not going to ship a fetch
-  script against a guessed one. Each folder's README says exactly what's needed manually.
+- **Messidor-2, IDRiD, CP-AnemiC**: no script. There is no stable, unauthenticated download URL
+  for any of these without a browser session, so there is no fetch script guessing at one. Each
+  folder's README says exactly what's needed manually.
 
 ## Contents
 
@@ -107,9 +106,9 @@ into the indexed dataset itself.
 | `smdg-19-glaucoma` | Glaucoma (imaging + demographics) | Kaggle | Yes | Yes |
 | `eyepacs-diabetes` | Diabetes (imaging) | Kaggle | Yes | Not yet |
 | `aptos2019-diabetes` | Diabetes (imaging) | Kaggle | Yes | Not yet |
-| `messidor2-diabetes` | Diabetes (imaging) | Academic registration | No — manual | Not yet |
-| `idrid-diabetes` | Diabetes (imaging) | IEEE DataPort | No — manual | Not yet |
-| `ai-readi-diabetes` | Diabetes (multimodal) | FAIRhub portal | No — manual | Not yet |
-| `cp-anemic` | Anemia (imaging) | Mendeley Data | No — manual (CC BY 4.0, confirmed) | Not yet |
+| `messidor2-diabetes` | Diabetes (imaging) | Academic registration | No, manual | Not yet |
+| `idrid-diabetes` | Diabetes (imaging) | IEEE DataPort | No, manual | Not yet |
+| `ai-readi-diabetes` | Diabetes (multimodal) | FAIRhub portal | No, manual | Not yet |
+| `cp-anemic` | Anemia (imaging) | Mendeley Data | No, manual (CC BY 4.0, confirmed) | Not yet |
 | `eyes-defy-anemia` | Anemia (imaging) | Kaggle | Yes | Not yet |
 | `idc-cancer-imaging` | Cancer (imaging) | Agentic API, not a bulk download | N/A | N/A |

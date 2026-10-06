@@ -4,8 +4,8 @@
 **Source:** [Kaggle competition](https://www.kaggle.com/c/diabetic-retinopathy-detection) ·
 mirrors also exist on [Hugging Face](https://huggingface.co/datasets/ctmedtech/EYEPACS) if the
 Kaggle download is unavailable
-**Size:** ~35,126 labeled training images (severity grades 0–4, ICDR scale); tens of GB — the
-largest of the diabetes datasets here, budget disk space and time accordingly.
+**Size:** ~35,126 labeled training images (severity grades 0–4, ICDR scale), tens of GB. This is
+the largest of the diabetes datasets here, so budget disk space and time accordingly.
 
 ## Fetch
 

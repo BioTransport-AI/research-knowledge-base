@@ -2,7 +2,7 @@
 
 **Condition:** Diabetes · **Modality:** Fundus images
 **Source:** [Kaggle competition](https://www.kaggle.com/c/aptos2019-blindness-detection)
-**Size:** ~3,662 labeled images (severity grades 0–4) — a few GB, much smaller than EyePACS.
+**Size:** ~3,662 labeled images (severity grades 0–4), a few GB, much smaller than EyePACS.
 
 ## Fetch
 
